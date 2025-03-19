@@ -1,0 +1,74 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<form class="layui-form p-4">
+    <div class="layui-form-bar">
+        <h3 class="pb-3">编辑用户</h3>
+    </div>
+    <input type="hidden" name="id" value="{$data.id}" />
+    <table class="layui-table layui-table-form">
+        <tr>
+            <td class="layui-td-gray">用户名<font>*</font></td>
+            <td>
+                <input type="text" value="{$data.username}" name="username" lay-verify="required" autocomplete="off" placeholder="请输入用户号" lay-reqText="请输入用户号" class="layui-input">
+            </td>
+            <td class="layui-td-gray">姓名<font>*</font></td>
+            <td>
+                <input type="text" value="{$data.nickname}" name="nickname" lay-verify="required" placeholder="请输入姓名" lay-reqText="请输入姓名" autocomplete="off" class="layui-input">
+            </td>
+        </tr>
+        <tr>
+            <td class="layui-td-gray">手机号码</td>
+            <td>
+                <input type="text" name="mobile" value="{$data.mobile}"  placeholder="请输入手机"  autocomplete="off" class="layui-input">
+            </td>
+            <td class="layui-td-gray">电子邮箱</td>
+            <td>
+                <input type="text" name="email" value="{$data.email}" placeholder="电子邮箱" autocomplete="off" class="layui-input">
+            </td>
+        </tr>
+        <tr>
+            <td class="layui-td-gray">用户角色<font>*</font>
+            </td>
+            <td>
+                {volist name=":get_admin_group()" id="v"}
+                <input type="checkbox" name="group_id[]" title="{$v.title}" value="{$v.id}" {volist name="$data.group_id" id="a" }{eq name="$a" value="$v.id" }checked{/eq}{/volist} lay-skin="primary">
+                {/volist}
+            </td>
+            <td class="layui-td-gray">用户状态<font>*</font></td>
+            <td>
+                <input type="radio" name="status" value="1" title="正常" {eq name="$data.status" value="1" }checked{/eq}>
+                <input type="radio" name="status" value="0" title="禁用" {eq name="$data.status" value="0"}checked{/eq}>
+            </td>
+        </tr>
+    </table>
+    <div class="py-3">
+        <button class="layui-btn layui-btn-normal" lay-submit>立即提交</button>
+        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+    </div>
+</form>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+    const moduleInit = ['tool'];
+    function gouguInit() {
+        var form = layui.form,tool=layui.tool;
+
+        form.on('submit()', function (data) {
+            let callback = function (e) {
+                layer.msg(e.msg);
+                if (e.code == 0) {
+                    parent.layui.tool.close(1000);
+                }
+            }
+            tool.post("/teach/user/save", data.field, callback);
+            return false;
+        });
+    }
+
+</script>
+{/block}
+<!-- /脚本 -->

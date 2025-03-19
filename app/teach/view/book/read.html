@@ -1,0 +1,47 @@
+{extend name="common/base"/}
+{block name="style"}
+<style>
+.content-article img{max-width:88%!important; height:auto!important; margin:6px 0!important; border-radius:4px;}
+</style>
+{/block}
+<!-- 主体 -->
+{block name="body"}
+<div class="layui-form p-4">
+	<h3 class="pb-3">图书详情</h3>
+	<table class="layui-table layui-table-form">
+		<tr>
+			<td class="layui-td-gray">书名</td>
+			<td>{$detail.book_name}</td>
+			<td class="layui-td-gray">价格</td>
+			<td>{$detail.price}</td>
+			<td rowspan="3" class="layui-td-gray">缩略图</td>
+			<td rowspan="3" style="width: 200px">
+				<img src="{$detail.url}" onerror="javascript:this.src='{__GOUGU__}/gougu/images/nonepic600x360.jpg';this.onerror=null;" style="width:200px; max-width:200px" />
+			</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray">书号</td>
+			<td>{$detail.book_no}</td>
+			<td class="layui-td-gray">出版时间</td>
+			<td>{$detail.publication_date}</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray">出版社</td>
+			<td>
+				{$detail.publisher}
+			</td>
+			<td class="layui-td-gray">作者</td>
+			<td>
+				{$detail.author}
+			</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray">摘要</td>
+			<td colspan="5" class="content-article">
+				{$detail.summary|raw}
+			</td>
+		</tr>
+	</table>
+</div>
+{/block}
+<!-- /主体 -->

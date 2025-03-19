@@ -1,0 +1,87 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<form class="layui-form p-page">
+	<h3 class="pb-3">友情链接</h3>
+	<table class="layui-table layui-table-form">
+		<tr>
+			<td class="layui-td-gray">网站名称<font>*</font></td>
+			<td><input type="text" name="name" lay-verify="required" placeholder="请输入网站名称" lay-reqText="请输入网站名称" class="layui-input" value="{$links.name|default=''}"></td>
+			<td rowspan="4" class="layui-td-gray">网站Logo</td>
+			<td rowspan="4">
+				<div class="layui-upload" style="text-align:center">
+					<button type="button" class="layui-btn layui-btn-normal layui-btn-sm" id="uploadBtn">上传网站Logo</button>
+					<div class="layui-upload-list" id="demo1" style="width:200px; height:120px; overflow:hidden">
+						<img {notempty name="$links.logo" }src="{:get_file($links.logo)}" {/notempty} heght="120px;" style="max-width: 100%;" />
+						<input type="hidden" name="logo" value="{$links.logo|default=''}">
+					</div>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray">网站链接<font>*</font></td>
+			<td><input type="text" name="src" lay-verify="required" placeholder="请输入网站链接" lay-reqText="请输入网站链接" class="layui-input" value="{$links.src|default=''}"></td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray-2">新窗口打开</td>
+			<td>
+			  {notempty name="$links.target" }
+			  <input type="radio" name="target" value="1" title="是" {eq name="$links.target" value="1" }checked{/eq}>
+			  <input type="radio" name="target" value="0" title="否" {eq name="$links.target" value="0" }checked{/eq}>
+			  {else/}
+			  <input type="radio" name="target" value="1" title="是" checked>
+			  <input type="radio" name="target" value="0" title="否">
+			  {/notempty}
+			</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray">排序</td>
+			<td><input type="text" name="sort" placeholder="请输入排序，数字" class="layui-input" value="{$links.sort|default='0'}"></td>
+		</tr>
+	</table>
+
+	<div class="py-3">
+		<input type="hidden" name="id" value="{$id}" />
+		<button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="webform">立即提交</button>
+		<button type="reset" class="layui-btn layui-btn-primary">重置</button>
+	</div>
+</form>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+	const moduleInit = ['tool'];
+	function gouguInit() {
+		var form = layui.form,tool=layui.tool,upload = layui.upload;
+		//图片
+		var uploadInst = upload.render({
+			elem: '#uploadBtn',
+			url: '/admin/api/upload',
+			done: function (e) {
+				//如果上传失败
+				if (e.code == 1) {
+					return layer.msg('上传失败');
+				}
+				//上传成功
+				$('#demo1 input').attr('value', e.data.id);
+				$('#demo1 img').attr('src', e.data.filepath);
+			}
+		});
+
+		//监听提交
+		form.on('submit(webform)', function (data) {
+			let callback = function (e) {
+				layer.msg(e.msg);
+				if (e.code == 0) {
+					tool.sideClose(1000);
+				}
+			}
+			tool.post("/admin/links/add", data.field, callback);
+			return false;
+		});
+	}
+</script>
+{/block}
+<!-- /脚本 -->

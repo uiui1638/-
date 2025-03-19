@@ -1,0 +1,64 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<form class="layui-form p-4">
+    <input type="hidden" name="tableName" value="student_bonus"> <!-- 添加表名隐藏字段 -->
+
+    <h3 class="pb-3">添加加分记录</h3>
+    <table class="layui-table layui-table-form">
+        <tr>
+            <td class="layui-td-gray">学生姓名<font>*</font></td>
+            <td>
+                <select name="student_name" lay-verify="required" lay-reqText="请选择学生姓名" class="layui-input">
+                    <option value="">请选择学生姓名</option>
+                    {foreach $students as $id => $name}
+                    <option value="{$name}">{$name}</option>
+                    {/foreach}
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td class="layui-td-gray">加分项名称<font>*</font></td>
+            <td>
+                <select name="bonus_item_name" lay-verify="required" lay-reqText="请选择加分项名称" class="layui-input">
+                    <option value="">请选择加分项名称</option>
+                    {foreach $bonusItems as $id => $name}
+                    <option value="{$name}">{$name}</option>
+                    {/foreach}
+                </select>
+            </td>
+        </tr>
+    </table>
+    <div class="py-3">
+        <button class="layui-btn layui-btn-normal" lay-submit>立即提交</button>
+        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+    </div>
+</form>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+    var moduleInit = ['tool'];
+
+    function gouguInit() {
+        var form = layui.form, tool = layui.tool;
+
+        // 监听提交
+        form.on('submit()', function (data) {
+            let callback = function (e) {
+                layer.msg(e.msg);
+                if (e.code == 0) {
+                    setTimeout(function () {
+                        parent.location.reload();
+                    }, 1000);
+                }
+            }
+            tool.post("/tyh1/stu4/add_bonus", data.field, callback);
+            return false;
+        });
+    }
+</script>
+{/block}
+<!-- /脚本 -->

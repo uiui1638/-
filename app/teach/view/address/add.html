@@ -1,0 +1,109 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<form class="layui-form p-4">
+    <h3 class="pb-3">新建地址</h3>
+    <table class="layui-table layui-table-form">
+        <tr>
+            <td class="layui-td-gray">所在省份<font>*</font></td>
+            <td>
+                <select id="province" name="province" lay-verify="required" lay-filter="province" lay-reqText="请选择省份">
+                    <option value="">请选择省份</option>
+                    {volist name="province" id="vo"}
+                    <option value="{$vo.id}">{$vo.name}</option>
+                    {/volist}
+                </select>
+            </td>
+
+            <td class="layui-td-gray">所在城市<font>*</font></td>
+            <td>
+                <select name="city" id="city" lay-verify="required" lay-filter="city" lay-reqText="请选择城市">
+                    <option value="">请选择城市</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td class="layui-td-gray">姓名<font>*</font></td>
+            <td>
+                <input type="text" name="name" class="layui-input" lay-verify="required" />
+            </td>
+
+            <td class="layui-td-gray">电话<font>*</font></td>
+            <td>
+                <input type="text" name="phone" class="layui-input" lay-verify="required"/>
+            </td>
+        </tr>
+        <tr>
+            <td class="layui-td-gray">详细地址<font>*</font></td>
+            <td colspan="3">
+                <input type="text" name="address" class="layui-input" lay-verify="required"
+                       placeholder="请输入详细地址"/>
+            </td>
+        </tr>
+    </table>
+    <div class="py-3">
+        <button class="layui-btn layui-btn-normal" lay-submit>立即提交</button>
+        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+    </div>
+</form>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+    var moduleInit = ['tool'];
+
+    function gouguInit() {
+        var form = layui.form, tool = layui.tool;
+
+        form.on('select(province)', function (data) {
+            var options = {
+                url: "/teach/address/search",
+                data: {"pid": data.value},
+            };
+            let callback = function (res) {
+                var city=JSON.parse(res);
+                $("#city").empty();
+                for (var i in city) {
+                    $("#city").append("<option>" + city[i].name + "</option>")
+                }
+                form.render('select');
+            }
+            tool.ajax(options, callback);
+
+            /*$.ajax({
+                type: "post",
+                url: "/teach/address/search",
+                data: {"pid": data.value},
+                success: function (data) {
+                    var city=JSON.parse(data);
+                    $("#city").empty();
+                    for (var i in city) {
+                        $("#city").append("<option>" + city[i].name + "</option>")
+                    }
+                    form.render('select');
+                }
+            })*/
+
+        });
+
+        form.on('submit()', function (data) {
+            let callback = function (e) {
+                layer.msg(e.msg);
+                if (e.code == 0) {
+                    setTimeout(function () {
+                        parent.location.reload();
+                    }, 1000);
+                }
+            }
+            console.log(data.field);
+            data.field.province = $("#province").find('option:selected').text();
+            console.log(data.field);
+            tool.post("/teach/address/add", data.field, callback);
+            return false;
+        });
+    }
+</script>
+{/block}
+<!-- /脚本 -->

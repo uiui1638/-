@@ -1,0 +1,123 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+
+<div class="p-3">
+    <form class="layui-form gg-form-bar border-t border-x">
+        <div class="layui-input-inline">
+            <select name="type_id" lay-filter="type">
+                <option value="">请选择图书分类</option>
+                {volist name="book_type" id="v"}
+                <option value="{$v.id}">{$v.type_name}</option>
+                {/volist}
+            </select>
+        </div>
+        <div class="layui-input-inline" style="width:300px;">
+            <input type="text" name="keywords" lay-affix="clear" placeholder="请输入关键字" class="layui-input"
+                   autocomplete="off"/>
+        </div>
+        <div class="layui-input-inline">
+            <button class="layui-btn layui-btn-normal" lay-submit>提交搜索</button>
+        </div>
+    </form>
+    <table class="layui-hide" id="tb"></table>
+</div>
+
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+    const moduleInit = ['tool'];
+
+    function gouguInit() {
+        var table = layui.table, tool = layui.tool, form = layui.form;
+        layui.pageTable = table.render({
+            elem: '#tb',
+            toolbar: false,
+            url: '/teach/book/index',
+            page: true,
+            even: true,
+            defaultToolbar: [],
+            limits: [10, 20, 50, 100],
+            limit: 10,
+            cols: [[
+                {type: 'numbers', title: '编号', align: 'center'},
+                {field: 'seller_name', title: '商家', align: 'center'},
+                {field: 'type_name', title: '图书类别', align: 'center'},
+                {field: 'book_name', title: '书名', align: 'center'},
+                {field: 'publisher', title: '出版社', align: 'center',},
+                {field: 'price', title: '价格', align: 'center',},
+                {field: 'number', title: '数量', align: 'center'},
+
+                {
+                    fixed: 'right', title: '操作', align: 'center', templet: function (d) {
+                        html = '<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="read">查看</a>';
+                        if (d.number > 0) {
+                            return html + '<button class="layui-btn layui-btn-sm layui-btn-normal" lay-event="add">加入购物车</button>';
+                        } else {
+                            return html + '<button class="layui-btn layui-btn-sm layui-btn-normal layui-btn-disabled" disabled lay-event="add">加入购物车</button>';
+                        }
+                    }
+                }
+            ]],
+            done: function () { //没有用到，只是为了演示
+                var is_manager = "{:is_manager()}";
+                table.hideCol("tb", {field: 'status', hide: is_manager})
+            }
+        });
+
+
+        //监听表格行工具事件
+        table.on('tool(tb)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'add') {  //加入购物车
+                let callback = function (e) {
+                    layer.msg(e.msg);
+                    /*if (e.code == 0) {
+                        setTimeout(function () {
+                            location.reload();
+                        }, 1000);
+                    }*/
+                }
+                tool.post("/teach/book/add_cart", {id: data.id}, callback);
+                return false;
+            } else if (obj.event === 'read') {
+                tool.side('/teach/book/read?id=' + data.id);
+            }
+            return false;
+        });
+
+
+        form.on('switch(up_down)', function (obj) {
+            let callback = function (e) {
+                layer.msg(e.msg);
+                if (e.code == 0) {
+                    setTimeout(function () {
+                        location.reload();
+                    }, 1000);
+                }
+            }
+            var data = {id: this.name, status: this.value}
+            tool.post("/teach/book/up_down", data, callback);
+            return false;
+        });
+
+        //监听搜索提交
+        form.on('submit()', function (data) {
+            layui.pageTable.reload({
+                where: {
+                    keywords: data.field.keywords,
+                    type_id: data.field.type_id
+                },
+                page: {
+                    curr: 1
+                }
+            });
+            return false;
+        });
+    }
+</script>
+{/block}
+<!-- /脚本 -->

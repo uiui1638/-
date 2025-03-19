@@ -1,0 +1,50 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<div class="p-3">
+
+  <table class="layui-hide" id="tb"></table>
+</div>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+  const moduleInit = ['tool'];
+
+  function gouguInit() {
+    var table = layui.table, tool = layui.tool, form = layui.form, layer = layui.layer;
+
+    // 初始化表格
+    layui.pageTable = table.render({
+      elem: '#tb',
+      url: '/tyh1/admin/get_average',
+      cols: [[
+        {field: 'student_name', title: '学生姓名', align: 'center'},
+        {field: 'average_score', title: '平均成绩', align: 'center'}
+      ]]
+    });
+
+    // 按钮点击事件
+    // $('#get_average_btn').on('click', function () {
+    //   tool.ajax("/tyh1/admin/get_average", {}, function (res) {
+    //     if (res.code === 0) {
+    //       // 刷新表格数据
+    //       layui.pageTable.reload({
+    //         data: res.data
+    //       });
+    //     } else {
+    //       layer.msg(res.msg);
+    //     }
+    //   });
+    // });
+  }
+
+  // 初始化页面
+  $(document).ready(function () {
+    gouguInit();
+  });
+</script>
+{/block}
+<!-- /脚本 -->

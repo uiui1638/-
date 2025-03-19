@@ -1,0 +1,140 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+
+<div class="p-3">
+    <form class="layui-form gg-form-bar border-t border-x">
+        <div class="layui-input-inline">
+            <select id="type_id" name="type_id" lay-filter="type">
+                <option value="">请选择图书分类</option>
+                {volist name="book_type" id="v"}
+                <!-- 下面的代码行中的eq判断只有管理员角色登录才有用，用于选中传过来的类别-->
+                <option value="{$v.id}" {eq name="$type_id" value="$v.id" }selected{/eq}>{$v.type_name}</option>
+                {/volist}
+            </select>
+        </div>
+        <div class="layui-input-inline" style="width:300px;">
+            <input type="text" name="keywords" lay-affix="clear" placeholder="请输入关键字" class="layui-input"
+                   autocomplete="off"/>
+        </div>
+        <div class="layui-input-inline">
+            <button class="layui-btn layui-btn-normal" lay-submit>提交搜索</button>
+        </div>
+    </form>
+    <table class="layui-hide" id="tb"></table>
+</div>
+
+
+<script type="text/html" id="toolbar">
+    <span class="layui-btn layui-btn-sm tab-a" data-title="添加图集" data-href="/admin/gallery/add">+ 添加图集</span>
+    <button type="button" class="layui-btn layui-btn-sm layui-btn-normal" lay-event="agree">
+        <i class="layui-icon layui-icon-success"></i> 通过
+    </button>
+    <button type="button" class="layui-btn layui-btn-sm layui-btn-danger" lay-event="refuse">
+        <i class="layui-icon layui-icon-refresh"></i> 拒绝
+    </button>
+</script>
+
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+    const moduleInit = ['tool'];
+
+    function gouguInit() {
+        var table = layui.table, tool = layui.tool, form = layui.form;
+        layui.pageTable = table.render({
+            elem: '#tb',
+            toolbar: '#toolbar',
+            url: '/teach/book/index?type_id=' + $("#type_id").val(),
+            page: true,
+            even: true,
+            limits: [10, 20, 50, 100],
+            limit: 10,
+            cols: [[
+                {type: 'checkbox'},
+                {type: 'numbers', title: '编号', align: 'center'},
+                {field: 'type_name', title: '图书类别', align: 'center'},
+                {field: 'book_name', title: '书名', align: 'center'},
+                {field: 'publisher', title: '出版社', align: 'center'},
+                {field: 'price', title: '价格', align: 'center'},
+                {field: 'number', title: '数量', align: 'center'},
+                {
+                    field: 'result', title: '审核状态', sort: true, align: 'center', templet: function (d) {
+                        if (d.result == 0) {
+                            return '待审核';
+                        } else if (d.result == 1) {
+                            return '<span style="color: green">通过</span>';
+                        } else {
+                            return '<span style="color: red">拒绝</span>';
+                        }
+                    }
+                }, {
+                    fixed: 'right', title: '操作', align: 'center', templet: function (d) {
+                        return '<a href="javascript:;" class="tab-a" data-id="' + d.id + '" data-title="图书详情" data-href="/teach/book/read?id=' + d.id + '">图书详情</a>';
+                    }
+                }
+            ]]
+        });
+
+
+        //监听表头工具栏事件
+        table.on('toolbar(tb)', function (obj) {
+            var checkStatus = table.checkStatus('tb');
+            var data = checkStatus.data;
+            if (data.length > 0) {
+                var book_id = [];
+                var result = 0;
+                for (var i in data)
+                    book_id[i] = data[i].id;
+                if (obj.event == 'agree') {
+                    result = 1;
+                } else if (obj.event == 'refuse') {
+                    result = 2;
+                }
+                let callback = function (e) {
+                    layer.msg(e.msg);
+                    if (e.code == 0) {
+                        table.reload('tb', {});
+                    }
+                }
+                tool.post("/teach/book/audit", {id: book_id, result: result}, callback);
+            } else {
+                layer.msg("请选择需要审核的数据！");
+            }
+            if (obj.event === 'add') {
+                tool.side("/teach/book/add");
+                return false;
+            } else if (obj.event === 'del') {
+
+            }
+        });
+
+        table.on('tool(tb)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'read') {
+                tool.side('/teach/book/read?id=' + data.id);
+            }
+            return false;
+        });
+
+
+        //监听搜索提交
+        form.on('submit()', function (data) {
+            layui.pageTable.reload({
+                where: {
+                    keywords: data.field.keywords,
+                    type_id: data.field.type_id
+                },
+                page: {
+                    curr: 1
+                }
+            });
+            return false;
+        });
+    }
+</script>
+{/block}
+<!-- /脚本 -->

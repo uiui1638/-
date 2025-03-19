@@ -1,0 +1,74 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<form class="layui-form p-4" id="editForm">
+  <h3 class="pb-3">编辑</h3>
+  <input type="hidden" name="id" value="{$record.id}" />
+  <table class="layui-table layui-table-form">
+    <tr>
+
+      <td class="layui-td-gray">树木序号<font>*</font></td>
+      <td>
+        <input type="text" name="tree_id" value="{$record.tree_id}"   class="layui-input"disabled>
+      </td>
+
+      <td class="layui-td-gray">检查日期<font>*</font></td>
+      <td>
+        <input type="text" id="date" name="check_date" value="{$record.check_date}" placeholder="请输入检查日期" lay-verify="required" class="layui-input">
+      </td>
+    </tr>
+    <tr>
+      <td class="layui-td-gray">检查结果<font>*</font></td>
+      <td>
+        <!--        <input type="text" name="check_result" value="{$record.check_result}" placeholder="请输入检查结果" lay-verify="required" class="layui-input">-->
+        <select name="check_result" lay-verify="required" class="layui-input">
+          <option value="" disabled selected>请选择检查结果</option>
+          <option value="healthy">健康</option>
+          <option value="sick">生病</option>
+          <option value="dead">死亡</option>
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <td class="layui-td-gray">处理建议<font>*</font></td>
+      <td colspan="3">
+        <input type="text" name="handling_suggestions" value="{$record.handling_suggestions}" placeholder="请输入处理建议" lay-verify="required" class="layui-input">
+      </td>
+    </tr>
+  </table>
+  <div class="py-3">
+    <button class="layui-btn layui-btn-normal" lay-submit>立即提交</button>
+    <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+  </div>
+</form>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+  var moduleInit = ['tool'];
+
+  function gouguInit() {
+    var form = layui.form, tool = layui.tool;laydate = layui.laydate;
+
+    laydate.render({
+      elem: '#date'
+    });
+    //监听提交
+    form.on('submit()', function (data) {
+      let callback = function (e) {
+        layer.msg(e.msg);
+        if (e.code == 0) {
+          setTimeout(function () {
+            parent.location.reload();
+          }, 1000);
+        }
+      }
+      tool.post("/tyh/why/edit_healthcheck", data.field, callback);
+      return false;
+    });
+  }
+</script>
+{/block}
+<!-- /脚本 -->

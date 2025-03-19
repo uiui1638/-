@@ -1,0 +1,57 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+
+<div class="p-3">
+    <form class="layui-form">
+        <div class="layui-input-inline" style="width:300px;">
+            <input type="text" name="keywords" class="layui-input" autocomplete="off"/>
+        </div>
+        <div class="layui-input-inline">
+            <button class="layui-btn layui-btn-normal" lay-submit>提交搜索</button>
+        </div>
+    </form>
+    <table class="layui-hide" id="tb"></table>
+</div>
+<!--表格头部工具栏内容-->
+<script type="text/html" id="toolbar">
+    <button type="button" class="layui-btn" lay-event="add"> 添加</button>
+</script>
+
+<script type="text/html" id="bar">
+    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+</script>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+    const moduleInit = ['tool'];
+
+    function gouguInit() {
+        var table = layui.table, tool = layui.tool, form = layui.form;
+        layui.pageTable = table.render({
+            elem: '#book',  //绑定元素选择器，对应
+            toolbar: '#toolbar',  //表格头部工具栏，显示时值为#模板id，如果不要显示设置为false
+            url: '/teach/book/index',
+            page: true,
+            even: true,
+            limits: [10, 20, 50, 100],
+            limit: 10,
+            cols: [[
+                {type: 'checkbox'},
+                {type: 'numbers', title: '编号', align: 'center'},
+                {field: 'field_name', title: '类别', align: 'center',},
+                {title: '操作', toolbar: '#barDemo', align: 'center'}
+            ]]
+        });
+        table.on('toolbar(tb)', function (obj) {
+        });//监听表头工具栏事件
+        table.on('tool(tb)', function (obj) {
+        }); //监听表格行工具事件
+        form.on('submit()', function (data) {
+        }); //监听搜索提交
+    }
+</script>
+{/block}

@@ -1,0 +1,96 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<div class="p-3">
+    <form class="layui-form">
+
+<!--        <div class="layui-inline">-->
+<!--            <label class="layui-form-label">ID</label>-->
+<!--            <div class="layui-input-inline">-->
+<!--                <input type="text" name="id" id="treeId" placeholder="请输入ID" autocomplete="off" class="layui-input">-->
+<!--            </div>-->
+<!--        </div>-->
+<!--        <div class="layui-inline">-->
+<!--            <button class="layui-btn" lay-submit lay-filter="searchForm">查找</button>-->
+<!--        </div>-->
+
+    </form>
+    <table class="layui-hide" id="tb"></table>
+</div>
+<!--表格头部工具栏内容-->
+
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+    const moduleInit = ['tool'];
+
+    function gouguInit() {
+        var table = layui.table, tool = layui.tool, form = layui.form;
+        layui.pageTable = table.render({
+            elem: '#tb',
+            toolbar: '#topbar',
+            url: '/tyh/yk/tree',
+
+
+            cols: [[
+
+                {type: 'numbers', title: '编号', align: 'center'},
+                {field: 'species_id', title: '种类序号', align: 'center',},
+                {field: 'planting_date', title: '种植日期', align: 'center',},
+                {field: 'location_id', title: '位置序号', align: 'center',},
+                {field: 'health_status', title: '健康情况', align: 'center',},
+
+            ]]
+        });
+        //监听表头工具栏事件
+
+
+        //监听表格行工具事件
+
+        //监听搜索提交
+         form.on('submit()', function (data) {
+                 layui.pageTable.reload({
+                     where: {
+                         keywords: data.field.keywords,
+                      },
+                      page: {
+                          curr: 1
+                      }
+                  });
+                  return false;
+              });
+             // form.on('submit(searchForm)', function(data) {
+                 // var treeId = $('#treeId').val();
+
+             //     if (!treeId) {
+             //         layer.msg('请输入ID', {icon: 5});
+             //         return false;
+             //     }
+             //
+             //     $.ajax({
+             //         url: '/tyh/yk/get_tree_info', // 替换为实际的后端接口路径
+             //         type: 'POST',
+             //         data: { id: treeId },
+             //         success: function(response) {
+             //             if (response.code === 0) {
+             //                 $('#result').show();
+             //                 $('#treeInfo').text(JSON.stringify(response.data, null, 2));
+             //             } else {
+             //                 layer.msg(response.message, {icon: 5});
+             //             }
+             //         },
+             //         error: function() {
+             //             layer.msg('请求失败，请重试', {icon: 5});
+             //         }
+             //     });
+             //
+             //     return false; // 阻止表单跳转
+             // });
+
+
+    }
+</script>
+{/block}

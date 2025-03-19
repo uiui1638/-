@@ -1,0 +1,176 @@
+{extend name="common/base" /}
+<!-- 主体 -->
+{block name="body"}
+<div class="p-3">
+    <form class="layui-form gg-form-bar border-t border-x">
+        <div class="layui-input-inline" style="width:200px;">
+            <input type="text" name="keywords" placeholder="名称" class="layui-input"/>
+        </div>
+        <div class="layui-input-inline">
+            <button class="layui-btn layui-btn-normal" lay-submit>搜索</button>
+        </div>
+    </form>
+    <table class="layui-hide" id="tb"></table>
+</div>
+<script type="text/html" id="bar">
+    <div class="layui-btn-container">
+        <button class="layui-btn layui-btn-sm add">+ 添加</button>
+    </div>
+</script>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+    const moduleInit = ['tool'];
+    function gouguInit() {
+        var table = layui.table, tool = layui.tool, form = layui.form;
+        layui.pageTable = table.render({
+            elem: '#tb'
+            , toolbar: '#bar'
+            , url: "/teach/publisher/index"
+            , page: true //开启分页
+            ,limit: 10
+            ,even:true
+            ,limits: [10, 20, 50, 100]
+            , cols: [[
+                {type: 'numbers', title: '序号', align: 'center', width: 100},
+                {field: 'name', title: '出版社名称'},
+                {field: 'sort', title: '显示顺序', align: 'center', width: 100},
+                {
+                    field: 'status', title: '状态', width: 100, align: 'center', templet: function (d) {
+                        var html1 = '<span>正常</span>';
+                        var html2 = '<span style="color:#FF5722">禁用</span>';
+                        if (d.status == 1) {
+                            return html1;
+                        }
+                        else {
+                            return html2;
+                        }
+                    }
+                },
+                 {
+                    width: 100, title: '操作', align: 'center', templet: function (d) {
+                        var html = '';
+                        var btn = '<a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>';
+                        var btn1 = '<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="disable">禁用</a>';
+                        var btn2 = '<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="open">启用</a>';
+                        if (d.status == 1) {
+                            html = '<div class="layui-btn-group">' + btn + btn1 + '</div>';
+                        }
+                        else {
+                            html = '<div class="layui-btn-group">' + btn + btn2 + '</div>';
+                        }
+                        return html;
+                    }
+                }
+            ]]
+        });
+
+        table.on('tool(tb)', function (obj) {
+            if (obj.event === 'edit') {
+                open(obj.data.id, obj.data.name, obj.data.sort);
+            }
+            if (obj.event === 'disable') {
+                layer.confirm('确定要禁用吗?', { icon: 3, title: '提示' }, function (index) {
+                    let callback = function (e) {
+                        layer.msg(e.msg);
+                        if (e.code == 0) {
+                            layer.close(index);
+                            layui.pageTable.reload()
+                        }
+                    }
+                    tool.post("/teach/publisher/disable", { id: obj.data.id, status: 0 }, callback);
+                    layer.close(index);
+                });
+            }
+            if (obj.event === 'open') {
+                layer.confirm('确定要启用吗?', { icon: 3, title: '提示' }, function (index) {
+                    let callback = function (e) {
+                        layer.msg(e.msg);
+                        if (e.code == 0) {
+                            layer.close(index);
+                            layui.pageTable.reload()
+                        }
+                    }
+                    tool.post("/teach/publisher/disable", { id: obj.data.id, status: 1 }, callback);
+                    layer.close(index);
+                });
+            }
+        });
+
+
+        $('body').on('click', '.add', function () {
+            open(0, '', '');
+        });
+
+        form.on('submit()', function (data) {
+            layui.pageTable.reload({
+                where: {
+                    keywords: data.field.keywords
+                },
+                page: {
+                    curr: 1
+                }
+            });
+            return false;
+        });
+
+        function open(id, name, sort) {
+            var biaoti = '新增';
+            if (id > 0) {
+                biaoti = '编辑';
+            }
+
+            layer.open({
+                type: 1
+                , title: biaoti
+                , area: '412px;'
+                , id: 'LAY_module' //设定一个id，防止重复弹出
+                , btn: ['确定', '取消']
+                , btnAlign: 'c'
+                , content: '<div style="padding-top:15px;">\
+								<div class="layui-form-item">\
+								  <label class="layui-form-label">出版社名称</label>\
+								  <div class="layui-input-inline" style="width:260px;">\
+									<input type="hidden" name="id" value="'+ id + '">\
+									<input type="text" name="name" autocomplete="off" value="'+ name + '" placeholder="请输入出版社名称" class="layui-input">\
+								  </div>\
+								</div>\
+								<div class="layui-form-item">\
+								  <label class="layui-form-label">排序</label>\
+								  <div class="layui-input-inline" style="width:260px;">\
+									<input type="number" name="sort" value="'+ sort + '" min="0" placeholder="请输入排序" step="1" lay-affix="number" class="layui-input">\
+								  </div>\
+								</div>\
+							  </div>'
+                , yes: function (index) {
+                    let id = $('#LAY_module').find('[name="id"]').val();
+                    let name = $('#LAY_module').find('[name="name"]').val();
+                    let sort = $('#LAY_module').find('[name="sort"]').val();
+                    let callback = function (e) {
+                        layer.msg(e.msg);
+                        if (e.code == 0) {
+                            if(e.code==0) {
+                                layer.close(index);
+                                layui.pageTable.reload();
+                            }
+                        }
+                    }
+                    tool.post("/teach/publisher/save", {
+                        id: id,
+                        name: name,
+                        sort: sort
+                    }, callback);
+                    return false;
+                }
+                , btn2: function () {
+                    layer.closeAll();
+                }
+            });
+        }
+    }
+</script>
+{/block}
+<!-- /脚本 -->

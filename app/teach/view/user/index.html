@@ -1,0 +1,134 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<div class="p-3">
+    <form class="layui-form gg-form-bar border-t border-x">
+        <div class="layui-input-inline" style="width: 320px;">
+            <input type="text" name="keywords" placeholder="登录账户/用户名/手机号码" class="layui-input"
+                   autocomplete="off"/>
+        </div>
+        <div class="layui-input-inline">
+            <button  class="layui-btn layui-btn-normal" lay-submit>提交搜索</button>
+        </div>
+    </form>
+    <table class="layui-hide" id="tb"></table>
+</div>
+
+
+<script type="text/html" id="toolbar">
+    <button class="layui-btn layui-btn-sm add">+ 添加用户</button>
+    <button id="upload" class="layui-btn layui-btn-sm" lay-options="{accept: 'file',exts: 'xls|xlsx'}">
+        导入用户
+    </button>
+    <a href="/static/导入模板.xlsx" class="layui-btn layui-btn-sm">下载模板</a>
+</script>
+<script type="text/html" id="bar">
+    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+    const moduleInit = ['tool'];
+
+    function gouguInit() {
+        var upload = layui.upload;
+        var table = layui.table, tool = layui.tool, form = layui.form;
+        layui.pageTable = table.render({
+            elem: '#tb',
+            title: '用户列表',
+            toolbar: '#toolbar',
+            url: '/teach/user/index',
+            page: true,
+            limit: 10,
+            even: true,
+            limits: [10, 20, 50, 100],
+            cols: [[
+                {type: 'numbers', title: '序号', align: 'center',width: 80},
+                {field: 'username', title: '用户号', align: 'center'},
+                {field: 'nickname', title: '姓名', align: 'center'},
+                {field: 'groupName', title: '角色', align: 'center'},
+                {
+                    field: 'status', title: '状态', width: 100, align: 'center', templet: function (d) {
+                        if (d.status == 1) {
+                            return '<span>正常</span>';
+                        } else {
+                            return '<span style="color:#FF5722">禁用</span>';
+                        }
+                    }
+                },
+                {field: 'login_num', title: '累计登录', align: 'center'},
+                {field: 'last_login_time', title: '最后登录时间', align: 'center'},
+                {title: '操作', toolbar: '#bar', width: 100, align: 'center'}
+            ]]
+        });
+        //表头工具栏事件
+        $('body').on('click', '.add', function () {
+            tool.side("/teach/user/add");
+            return;
+        });
+
+
+        table.on('tool(tb)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'edit') {
+                tool.side('/teach/user/edit?id=' + obj.data.id);  //向后台传递编辑的id，其中data.id中的id为book_type的主键字段名称
+                return;
+            }
+            if (obj.event === 'del') {
+                layer.confirm('确定要删除用户 ' + data.nickname + '  该数据吗？', {
+                    icon: 3,
+                    title: '提示'
+                }, function (index) {
+                    let callback = function (e) {
+                        layer.msg(e.msg);
+                        if (e.code == 0) {
+                            obj.del();
+                        }
+                    }
+                    tool.delete("/teach/user/delete", {id: data.id}, callback);
+                    layer.close(index);
+                });
+            }
+        });
+
+
+        upload.render({
+            elem: '#upload', // 绑定元素
+            url: '/teach/user/import_user', // 此处配置你自己的上传接口即可
+            accept: 'file', // 普通文件
+            done: function (res) {
+                //如果上传失败
+                if (res.code == 1) {
+                    return layer.msg('导入失败');
+                } else {
+                    layer.msg(res.msg);
+                    setTimeout(function () {
+                        location.reload();
+                    }, 1000);
+
+                }
+
+            }
+        });
+
+        //监听搜索提交
+        form.on('submit()', function (data) {
+            layui.pageTable.reload({
+                where: {
+                    keywords: data.field.keywords
+                },
+                page: {
+                    curr: 1
+                }
+            });
+            return false;
+        });
+    }
+</script>
+{/block}
+<!-- /脚本 -->

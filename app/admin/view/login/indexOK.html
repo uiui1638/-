@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="renderer" content="webkit" />
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<title>动态网站开发</title>
+	<link rel="stylesheet" href="{__GOUGU__}/layui/css/layui.css" media="all">
+	<style type="text/css">
+		h2 {
+			font-size: 20px;
+			line-height: 40px;
+			text-align: center
+		}
+		img {
+			border: none
+		}
+		.g_w1200 {
+			width: 1350px;
+			margin: 0 auto;
+		}
+
+		.hd_header {
+			height: 100px;
+			display: block;
+			background-color: #4A4E8F
+		}
+
+		.hd_header .hd_header_logo {
+			float: left;
+		}
+
+		.hd_header .hd_header_logo img {
+			height: 100px;
+		}
+
+		.login_container .login_img {
+			position: absolute;
+			left: 0;
+			top: 50%;
+			margin-top: -220px;
+		}
+		.login_container {
+			background: url(/static/admin/images/loginBg.jpg) repeat-x 0 0;
+			min-width: 1200px;
+			background-color: #0069bc
+		}
+
+		.login_container .g_w1200 {
+			min-height: 500px;
+			position: relative
+		}
+		.mess {
+			position: absolute;
+			bottom: 20px;
+			left: 0;
+			right: 0;
+			text-align: center;
+			color: #95a6aa;
+			font-size: 12px
+		}
+
+
+		.lg_hd_dialog_warp {
+			position: absolute;
+			right: 15px;
+			bottom: 15px;
+			height: 400px;
+			width: 354px;
+			background-color: #fff;
+			border-radius: 5px
+		}
+
+		.lg_hd_dialog_warp .login_dialog .lg_cn_warp {
+			width: 300px;
+			margin: 0 27px
+		}
+	</style>
+</head>
+<body>
+	<div class="hd_header">
+		<div class="g_w1200">
+			<div class="hd_header_logo">
+				<a href="http://www.ecjtu.edu.cn/">
+					<img src="/static/admin/images/logo_ecjtu.png"  alt="">
+				</a>
+			</div>
+		</div>
+	</div>
+	<div class="login_container">
+		<div class="g_w1200" >
+			<div class="login_img">
+				<img src="/static/admin/images/login_bg.png" alt="">
+			</div>
+			<div class="login_content lg_hd_dialog_warp">
+
+					<div class="login_dialog">
+						<div class="lg_cn_warp">
+
+									<h2>用户登录</h2>
+									<div class="login_pwd">
+											<form class="layui-form" id="gougu-login">
+												<div class="layui-form-item">
+													<input type="text" name="username" lay-verify="required" value="admin" placeholder="请输入账户" lay-reqText="请输入账户" autocomplete="off" class="layui-input">
+												</div>
+												<div class="layui-form-item">
+													<input type="password" name="password" lay-verify="required" value="123456" placeholder="请输入密码" lay-reqText="请输入密码" autocomplete="off" class="layui-input">
+												</div>
+												<!--<div class="layui-form-item">
+                                                    <div class="layui-input-inline" style="width:158px;">
+                                                        <input type="text" name="captcha" lay-verify="required" placeholder="验证码" lay-reqText="请输入验证码" autocomplete="off" class="layui-input">
+                                                    </div>
+                                                    <div class="layui-input-inline captcha_img" style="width:142px; height:44px; margin-right:0">
+                                                        {:captcha_img()}
+                                                        <input type="hidden" value="{:make_token()}"/>
+                                                    </div>
+                                                </div>-->
+
+												<button id="login-submit" class="layui-btn layui-btn-fluid layui-bg-cyan" lay-submit lay-filter="login-submit">登入系统</button>
+											</form>
+										</div>
+
+							<p class="mess">* 温馨提示：原系统已有账号无需重新注册可直接登录</p>
+						</div>
+					</div>
+
+			</div>
+		</div>
+	</div>
+	<div class="hd-footer">
+
+	</div>
+
+<script src="{__GOUGU__}/layui/layui.js"></script>
+<script type="text/javascript">
+	layui.use(['form'], function() {
+		var form = layui.form,
+				layer = layui.layer,
+				$ = layui.$;
+		form.on('submit(login-submit)', function(data) {
+			$.ajax({
+				url: "/admin/login/login_submit",
+				data: $('#gougu-login').serialize(),
+				type: 'post',
+				async: false,
+				success: function(res) {
+					layer.tips(res.msg, '#login-submit');
+					if (res.code === 0) {
+						setTimeout(function() {
+							//	parent.document.location.reload();
+							parent.document.location.href="{:url('/admin/index')}";
+						}, 1500);
+					} else {
+						$('[alt="captcha"]').click();
+					}
+				}
+			})
+			return false;
+		});
+	});
+</script>
+</body>
+</html>

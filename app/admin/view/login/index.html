@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="renderer" content="webkit"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>动态网站开发</title>
+    <link rel="stylesheet" href="{__GOUGU__}/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/static/admin/login.css?v1.0">
+</head>
+<body>
+<div class="container">
+    <div class="side-container">
+        <div class="side">
+            <div class="">
+                <h2>
+                    动态网站开发
+                </h2>
+                <div class="sidebox_header">
+                    信息与软件工程学院 曾辉
+                </div>
+            </div>
+
+            <div class="sidebox_content">
+                本课程是是培养学生基于主流开发语言及数据库的动态网站开发技能的一门综合应用型课程。本课程采取项目引导，任务驱动的教学模式。在课程中通过一个完整的动态网站项目的学习让学生熟悉项目开发的完整工作过程。
+            </div>
+
+            <div class="sidebox_footer">
+                <strong>授课班级：计算机2022、物联网2022</strong>
+            </div>
+
+        </div>
+    </div>
+    <div class="form_container">
+        <div class="form">
+            <div class="form_panel">
+                <div class="form_header">
+                    <h2>登录</h2>
+                    <span class="pull-right" style="line-height: 40px;">没有帐号？<a href="#">点此注册</a></span>
+                </div>
+
+                <form class="layui-form" id="gougu-login">
+                    <div class="layui-form-item">
+                        <div class="layui-input-wrap">
+                            <div class="layui-input-prefix">
+                                <i class="layui-icon layui-icon-username"></i>
+                            </div>
+                            <input type="text" name="username" lay-verify="required" value="manager"
+                                   placeholder="请输入账户" lay-reqText="请输入账户" autocomplete="off"
+                                   class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-input-wrap">
+                            <div class="layui-input-prefix">
+                                <i class="layui-icon layui-icon-password"></i>
+                            </div>
+                            <input type="password" name="password" lay-verify="required" value="123456"
+                                   placeholder="请输入密码" lay-reqText="请输入密码" autocomplete="off"
+                                   class="layui-input">
+                        </div>
+                    </div>
+                    <!--<div class="layui-form-item">
+                        <div class="layui-row">
+                            <div class="layui-col-xs7">
+                                <div class="layui-input-wrap">
+                                    <div class="layui-input-prefix">
+                                        <i class="layui-icon layui-icon-vercode"></i>
+                                    </div>
+                                    <input type="text" name="captcha" value="" lay-verify="required" placeholder="验证码" lay-reqtext="请填写验证码" autocomplete="off" class="layui-input" lay-affix="clear">
+                                </div>
+                            </div>
+                            <div class="layui-col-xs5" >
+                                <div class="captcha" style="margin-left: 10px;">
+                                    {:captcha_img()}
+                                    <input type="hidden" value="{:make_token()}"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>-->
+                    <!--<div class="layui-form-item">
+
+                        <div class="layui-input-wrap">
+                            <div class="layui-input-prefix">
+                                <i class="layui-icon layui-icon-vercode"></i>
+                            </div>
+                            <div class="layui-input-inline" style="width:158px;">
+                                <input type="text" name="captcha" lay-verify="required" placeholder="验证码"
+                                       lay-reqText="请输入验证码" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-input-inline captcha" style="width:60px; height:16px; margin-right:0">
+                            {:captcha_img()}
+                            <input type="hidden" value="{:make_token()}"/>
+                        </div>
+                    </div>-->
+                    <div class="layui-form-item">
+                        <input type="checkbox" style="margin-top: 0" name="remeber_me" title="记住我">
+                        <span class="pull-right"><a href="#">短信验证码登录</a></span>
+                    </div>
+                    <button id="login-submit" class="layui-btn layui-btn-fluid layui-bg-red" lay-submit
+                            lay-filter="login-submit">登入系统
+                    </button>
+                </form>
+                <div class="text-center">
+                    <a class="forget-password" href="#">已有帐号，忘记密码？</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="{__GOUGU__}/layui/layui.js"></script>
+<script type="text/javascript">
+    layui.use(['form'], function () {
+        var form = layui.form,
+            layer = layui.layer,
+            $ = layui.$;
+        form.on('submit(login-submit)', function (data) {
+            $.ajax({
+                url: "/admin/login/login_submit",
+                data: $('#gougu-login').serialize(),
+                type: 'post',
+                async: false,
+                success: function (res) {
+                    layer.tips(res.msg, '#login-submit');
+                    if (res.code === 0) {
+                        setTimeout(function () {
+                            //	parent.document.location.reload();
+                            parent.document.location.href = "{:url('/admin/index')}";
+                        }, 1500);
+                    } else {
+                        $('[alt="captcha"]').click();
+                    }
+                }
+            })
+            return false;
+        });
+    });
+</script>
+</body>
+</html>

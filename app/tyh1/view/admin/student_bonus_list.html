@@ -1,0 +1,118 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<div class="p-3">
+    <table class="layui-hide" id="tb"></table>
+</div>
+
+<!-- 弹出层模板 -->
+<div style="display: none;" id="detailsLayer">
+    <div class="layui-fluid">
+        <div class="layui-row layui-col-space15">
+            <div class="layui-col-md12">
+                <div class="layui-card">
+                    <div class="layui-card-header">学生加分项详情</div>
+                    <div class="layui-card-body">
+                        <table class="layui-table" id="detailsTable"></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+    const moduleInit = ['tool'];
+
+    function gouguInit() {
+        var table = layui.table, tool = layui.tool, form = layui.form;
+
+        // 渲染表格
+        layui.pageTable = table.render({
+            elem: '#tb',
+            url: '/tyh1/admin/student_bonus_list',
+            even: true,
+            cols: [[
+                {type: 'checkbox'},
+                {type: 'numbers', title: '编号', align: 'center'},
+                {field: 'name', title: '学生姓名', align: 'center'},
+                {field: 'total_score', title: '总得分', align: 'center'},
+                {field: 'scholarship', title: '奖学金等级', align: 'center'},
+                {title: '操作', toolbar: '#bar', align: 'center'}
+            ]],
+            toolbar: '#topbar'
+        });
+
+        // 操作列模板
+        var bar = document.getElementById('bar').innerHTML;
+
+        // 监听表格行工具事件
+        table.on('tool(tb)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'details') {
+                // 显示弹出层并加载详细信息
+                layer.open({
+                    type: 1,
+                    title: '学生加分项详情 - ' + data.name,
+                    area: ['600px', '400px'],
+                    content: $('#detailsLayer'),
+                    success: function (layero, index) {
+                        // 加载详细信息
+                        $.ajax({
+                            url: '/tyh1/admin/student_bonus_details',
+                            type: 'POST',
+                            data: { student_id: data.id },
+                            success: function (response) {
+                                if (response.code === 0) {
+                                    // 渲染详细信息表格
+                                    table.render({
+                                        elem: '#detailsTable',
+                                        data: response.data,
+                                        cols: [[
+                                            {field: 'bonus_item_name', title: '加分项名称', align: 'center'},
+                                            {field: 'bonus_item_score', title: '加分项分数', align: 'center'}
+                                        ]]
+                                    });
+                                } else {
+                                    layer.msg(response.msg, {icon: 2});
+                                }
+                            },
+                            error: function () {
+                                layer.msg('请求失败', {icon: 2});
+                            }
+                        });
+                    }
+                });
+            }
+            return false;
+        });
+
+        // 监听搜索提交
+        form.on('submit(search)', function (data) {
+            layui.pageTable.reload({
+                where: {
+                    keywords: data.field.keywords,
+                },
+                page: {
+                    curr: 1
+                }
+            });
+            return false;
+        });
+    }
+
+    // 初始化页面
+    $(document).ready(function () {
+        gouguInit();
+    });
+</script>
+
+<!-- 操作列模板 -->
+<script type="text/html" id="bar">
+    <a class="layui-btn layui-btn-xs" lay-event="details">查看详情</a>
+</script>
+{/block}

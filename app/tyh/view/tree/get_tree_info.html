@@ -1,0 +1,57 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<div class="p-3">
+    <form class="layui-form">
+
+    </form>
+    <table class="layui-hide" id="tb"></table>
+</div>
+<!--表格头部工具栏内容-->
+
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+    const moduleInit = ['tool'];
+
+    function gouguInit() {
+        var table = layui.table, tool = layui.tool, form = layui.form;
+        layui.pageTable = table.render({
+            elem: '#tb',
+            toolbar: '#topbar',
+            url: '/tyh/tree/get_tree_info',
+            even: true,
+
+            cols: [[
+
+                {type: 'numbers', title: '编号', align: 'center'},
+                {field: 'species_id', title: '种类序号', align: 'center',},
+                {field: 'planting_date', title: '种植日期', align: 'center',},
+                {field: 'location_id', title: '位置序号', align: 'center',},
+                {field: 'health_status', title: '健康情况', align: 'center',},
+
+            ]]
+        });
+        //监听表头工具栏事件
+
+
+        //监听表格行工具事件
+
+        //监听搜索提交
+        form.on('submit()', function (data) {
+            layui.pageTable.reload({
+                where: {
+                    keywords: data.field.keywords,
+                },
+                page: {
+                    curr: 1
+                }
+            });
+            return false;
+        });
+    }
+</script>
+{/block}

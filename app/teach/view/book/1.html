@@ -1,0 +1,41 @@
+<form class="layui-form">
+  <div class="layui-input-inline" style="width:300px;">
+    <input type="text" name="keywords" class="layui-input" autocomplete="off"/>
+  </div>
+  <div class="layui-input-inline">
+    <button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="searchform">提交搜索</button>
+  </div>
+</form>
+<table class="layui-hide" id="book"></table>
+
+<!--表格头部工具栏内容-->
+<script type="text/html" id="toolbarDemo">
+  <button type="button" class="layui-btn" lay-event="add"> 添加 </button>
+</script>
+
+<script type="text/html" id="barDemo">
+  <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+</script>
+<script>
+  layui.use(['table','form'], function(){
+    var table = layui.table,form = layui.form;
+    var instance = table.render({   //渲染表格，并获得实例对象
+      elem: '#book',  //绑定元素选择器，对应
+      toolbar: '#toolbarDemo',  //表格头部工具栏，显示时值为#模板id，如果不要显示设置为false
+      url: '/teach/book/index',
+      page: true,
+      even: true,
+      limits: [10, 20, 50, 100],
+      limit: 10,
+      cols: [[
+        {type: 'checkbox'},
+        {type: 'numbers', title: '编号', align: 'center'},
+        {field: 'field_name', title: '类别', align: 'center',},
+        {title: '操作', toolbar: '#barDemo', align: 'center'}
+      ]]
+    });
+    table.on('toolbar(book)', function (obj) {   });//监听表头工具栏事件
+    table.on('tool(book)', function (obj) {    }); //监听表格行工具事件
+    form.on('submit(searchform)', function (data) {   }); //监听搜索提交
+  })
+</script>

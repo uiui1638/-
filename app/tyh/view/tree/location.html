@@ -1,0 +1,88 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<div class="p-3">
+    <form class="layui-form">
+
+    </form>
+    <table class="layui-hide" id="tb"></table>
+</div>
+<!--表格头部工具栏内容-->
+<script type="text/html" id="topbar">
+    <button type="button" class="layui-btn" lay-event="add"><i class="layui-icon layui-icon-addition"></i>  添加</button>
+</script>
+
+<script type="text/html" id="bar">
+    <a class="layui-btn layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i> 编辑</a>
+    <a class="layui-btn layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i> 删除</a>
+</script>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+    const moduleInit = ['tool'];
+
+    function gouguInit() {
+        var table = layui.table, tool = layui.tool, form = layui.form;
+        layui.pageTable = table.render({
+            elem: '#tb',
+            toolbar: '#topbar',
+            url: '/tyh/tree/location',
+            even: true,
+            cols: [[
+                {type: 'checkbox'},
+                {type: 'numbers', title: '编号', align: 'center'},
+                {field: 'longitude', title: '经度', align: 'center',},
+                {field: 'latitude', title: '纬度', align: 'center',},
+                {field: 'address_description', title: '地址信息', align: 'center',},
+                {title: '操作', toolbar: '#bar', align: 'center'}
+            ]]
+        });
+        //监听表头工具栏事件
+        table.on('toolbar(tb)', function (obj) {
+            if (obj.event === 'add') {
+                tool.side("/tyh/tree/add_location");
+                return false;
+            }
+        });
+
+        //监听表格行工具事件
+        table.on('tool(tb)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'edit') {
+                tool.side('/tyh/tree/edit_location?id=' + data.id); //url为具体的后台地址如 /zh/book/edit，其中的data.id中的id为表的主键
+            } else if (obj.event === 'del') {
+                layer.confirm('确定要删除该记录吗?', {
+                    icon: 3,
+                    title: '提示'
+                }, function (index) {
+                    let callback = function (e) {
+                        layer.msg(e.msg);
+                        if (e.code == 0) {
+                            obj.del();
+                        }
+                    }
+                    tool.delete("/tyh/tree/delete_location", {id: data.id}, callback);
+                    layer.close(index);
+                });
+            }
+            return false;
+        });
+
+        //监听搜索提交
+        form.on('submit()', function (data) {
+            layui.pageTable.reload({
+                where: {
+                    keywords: data.field.keywords,
+                },
+                page: {
+                    curr: 1
+                }
+            });
+            return false;
+        });
+    }
+</script>
+{/block}

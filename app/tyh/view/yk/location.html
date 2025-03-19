@@ -1,0 +1,53 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<div class="p-3">
+    <form class="layui-form">
+
+    </form>
+    <table class="layui-hide" id="tb"></table>
+</div>
+<!--表格头部工具栏内容-->
+
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+    const moduleInit = ['tool'];
+
+    function gouguInit() {
+        var table = layui.table, tool = layui.tool, form = layui.form;
+        layui.pageTable = table.render({
+            elem: '#tb',
+            toolbar: '#topbar',
+            url: '/tyh/yk/location',
+
+            even: true,
+
+            cols: [[
+
+                {type: 'numbers', title: '编号', align: 'center'},
+                {field: 'longitude', title: '经度', align: 'center',},
+                {field: 'latitude', title: '纬度', align: 'center',},
+                {field: 'address_description', title: '地址信息', align: 'center',},
+
+            ]]
+        });
+
+        //监听搜索提交
+        form.on('submit()', function (data) {
+            layui.pageTable.reload({
+                where: {
+                    keywords: data.field.keywords,
+                },
+                page: {
+                    curr: 1
+                }
+            });
+            return false;
+        });
+    }
+</script>
+{/block}

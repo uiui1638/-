@@ -1,0 +1,91 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<div class="p-3">
+    <table class="layui-hide" id="tb"></table>
+</div>
+
+<script type="text/html" id="toolbar">
+    <button class="layui-btn layui-btn-sm" lay-event="add">+ 添加地址</button>
+    <button class="layui-btn layui-bg-blue layui-btn-sm" lay-event="default"> 设为默认</button>
+</script>
+<script type="text/html" id="bar">
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+    const moduleInit = ['tool'];
+
+    function gouguInit() {
+        var table = layui.table, tool = layui.tool, form = layui.form;
+        var util = layui.util;
+        layui.pageTable = table.render({
+            elem: '#tb',   //对应13行的id的值
+            toolbar: '#toolbar',
+            page: false,
+            even: true, //奇偶行变色
+            url: '/teach/address/index', //数据接口
+            cols: [[
+                {type: 'radio'},
+                {type: 'numbers', title: '序号', align: 'center', width: 80},
+                {field: 'address', title: '地址'},
+                {field: 'name', title: '收件人', align: 'center'},
+                {field: 'phone', title: '电话', align: 'center'},
+                {
+                    field: 'is_default', title: '是否默认', align: 'center', templet: function (d) {
+                        if (d.is_default == 1) return '是';
+                        else return '';
+                    }
+                },
+                {title: '操作', toolbar: '#bar', width: 100, align: 'center'}
+            ]]
+        });
+
+        table.on('toolbar(tb)', function (obj) {
+            if (obj.event === "add") {
+                tool.side("/teach/address/add");
+                return false;
+            } else if (obj.event === "default") {
+                var checkStatus = table.checkStatus('tb').data;
+                if (checkStatus.length > 0) {
+                    let callback = function (e) {
+                        layer.msg(e.msg);
+                        if (e.code == 0) {
+                            table.reload('tb', {});
+                        }
+                    }
+                    tool.post("/teach/address/edit", {id: checkStatus[0].id, is_default: '1'}, callback);
+                } else {
+                    layer.msg("请选择需要操作的数据！");
+                }
+            }
+        });
+
+        table.on('tool(tb)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'del') {
+                layer.confirm('确定要删除该数据吗？', {
+                    icon: 3,
+                    title: '提示'
+                }, function (index) {
+                    let callback = function (e) {
+                        layer.msg(e.msg);
+                        if (e.code == 0) {
+                            obj.del();
+                        }
+                    }
+                    tool.delete("/teach/address/delete", {id: data.id}, callback);
+                    layer.close(index);
+                });
+            }
+        });
+
+
+    }
+</script>
+{/block}
+<!-- /脚本 -->

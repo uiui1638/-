@@ -1,0 +1,68 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<form class="layui-form p-4" id="editForm">
+    <h3 class="pb-3">编辑加分记录</h3>
+    <input type="hidden" name="id" value="{$bonus.id}" />
+    <table class="layui-table layui-table-form">
+        <tr>
+            <td class="layui-td-gray">学生姓名<font>*</font></td>
+            <td>
+                <input type="text" name="student_name" value="{$bonus.student_name}" class="layui-input" disabled>
+            </td>
+            <td class="layui-td-gray">加分项<font>*</font></td>
+            <td>
+                <input type="text" name="bonus_name" value="{$bonus.bonus_name}" class="layui-input" disabled>
+            </td>
+            <td class="layui-td-gray">加分值<font>*</font></td>
+            <td>
+                <input type="text" name="score" value="{$bonus.score}" placeholder="请输入加分值" lay-verify="required" class="layui-input">
+            </td>
+        </tr>
+<!--        <tr>-->
+<!--            <td class="layui-td-gray">审核状态<font>*</font></td>-->
+<!--            <td colspan="5">-->
+<!--                <select name="status" lay-verify="required" class="layui-select">-->
+<!--                    <option value="待审核" {if condition="$bonus.status eq '待审核'"}selected{/if}>待审核</option>-->
+<!--                    <option value="已通过" {if condition="$bonus.status eq '已通过'"}selected{/if}>已通过</option>-->
+<!--                    <option value="未通过" {if condition="$bonus.status eq '未通过'"}selected{/if}>未通过</option>-->
+<!--                </select>-->
+<!--            </td>-->
+<!--        </tr>-->
+    </table>
+    <div class="py-3">
+        <button class="layui-btn layui-btn-normal" lay-submit>立即提交</button>
+        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+    </div>
+</form>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+    var moduleInit = ['form'];
+
+    function gouguInit() {
+        var form = layui.form;
+
+        // 监听提交
+        form.on('submit()', function (data) {
+            let callback = function (response) {
+                layer.msg(response.msg);
+                if (response.code == 0) {
+                    setTimeout(function () {
+                        parent.location.reload();
+                    }, 1000);
+                }
+            };
+            $.post("/tyh1/stu4/edit_bonus", data.field, callback);
+            return false;
+        });
+    }
+
+    // 初始化
+    gouguInit();
+</script>
+{/block}
+<!-- /脚本 -->
