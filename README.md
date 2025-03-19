@@ -1,3 +1,5 @@
+#本系统基于勾股框架进行设计，以下是勾股框架相关介绍
+
 ## 📐 勾股CMS4.0
 ![输入图片说明](https://www.gougucms.com/storage/image/slogo.jpg)
 
@@ -197,14 +199,3 @@ composer install
 - 勾股CMS遵循Apache2开源协议发布。 
 - 开源的系统少不了大家的参与，如果大家在体验的过程中发现有问题或者BUG，请到Issue里面反馈，谢谢！
 - 毫无保留的真开源，如果觉得勾股CMS不错，不要吝啬您的赞许和鼓励，请给我们⭐ STAR ⭐吧！
-
-### 👍 支持我们
-- If the project is very helpful to you, you can buy the author a cup of coffee☕.
-- 如果这个项目对您有帮助，可以请作者喝杯咖啡吧☕
-- 商务合作、定制服务，请搜索微信号：hdm588，添加微信咨询了解🤝。
-
-|支付宝      |    微信|
-| :--------: | :--------:|
-| <img src="https://www.gougucms.com/static/home/images/zfb.png" width="300"  align=center />|<img src="https://www.gougucms.com/static/home/images/wx.png" width="300"  align=center />|
-#   -  
- 
